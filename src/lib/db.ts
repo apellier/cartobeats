@@ -17,8 +17,20 @@ const getPrismaInstance = () => {
   }
 
   const isLocal = connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+  let cleanConnectionString = connectionString;
+  
+  if (!isLocal) {
+    try {
+      const parsedUrl = new URL(connectionString);
+      parsedUrl.searchParams.delete("sslmode");
+      cleanConnectionString = parsedUrl.toString();
+    } catch (e) {
+      cleanConnectionString = connectionString.replace(/[?&]sslmode=[^&]*/gi, "");
+    }
+  }
+
   const pool = new pg.Pool({ 
-    connectionString,
+    connectionString: cleanConnectionString,
     ssl: isLocal ? false : { rejectUnauthorized: false }
   });
   const adapter = new PrismaPg(pool);
