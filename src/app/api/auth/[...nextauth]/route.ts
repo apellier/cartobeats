@@ -10,6 +10,7 @@ export const authOptions = {
       authorization: {
         params: {
           scope: "playlist-read-private playlist-read-collaborative user-read-email user-read-private",
+          show_dialog: true,
         },
       },
     }),
