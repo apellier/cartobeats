@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Playlist {
+  id          String          @id
+  name        String
+  description String?
+  ownerName   String?
+  imageUrl    String?
+  trackCount  Int
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  tracks      PlaylistTrack[]
+}
+
+model Track {
+  id               String          @id
+  name             String
+  artists          String          // Stocké sous forme de chaîne simple (ex: "Artist 1, Artist 2")
+  primaryArtist    String?         // Artiste principal extrait sans découpage par virgule
+  primaryArtistId  String?         // ID Spotify de l'artiste principal
+  albumName        String
+  albumImageUrl    String?
+  durationMs       Int
+  previewUrl       String?
+  isrc             String?
+  danceability     Float?
+  energy           Float?
+  key              Int?
+  loudness         Float?
+  mode             Int?
+  speechiness      Float?
+  acousticness     Float?
+  instrumentalness Float?
+  liveness         Float?
+  valence          Float?
+  tempo            Float?
+  genres           String?         // Liste de genres communautaires (ex: "rock, indie pop, shoegaze")
+  createdAt        DateTime        @default(now())
+  playlists        PlaylistTrack[]
+}
+
+model PlaylistTrack {
+  playlistId String
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  trackId    String
+  track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  position   Int
+
+  @@id([playlistId, trackId])
+}
+
+model SystemConfig {
+  key   String @id
+  value String
+}
+
+model ArtistCache {
+  id              String   @id @default(cuid())
+  spotifyArtistId String?  @unique
+  artistNameQuery String   @unique
+  mbid            String?
+  nameFound       String?
+  countryCode     String?
+  lastFetched     DateTime @default(now()) @updatedAt
+  source          String   @default("MusicBrainzAPI")
+
+  @@index([artistNameQuery])
+  @@index([spotifyArtistId])
+}

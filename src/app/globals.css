@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --bg-main: #fbf8f3;       /* Fond général crème doux */
+  --foreground: #1c1917;    /* Texte foncé */
+  --border-color: #1c1917;  /* Bordures foncées épaisses */
+  --shadow-color: #1c1917;
+  
+  /* Palettes Pastel Néo-Brutalistes */
+  --color-pink: #ffa6c9;    /* Rose pétillant mais doux */
+  --color-blue: #a0c4ff;    /* Bleu ciel */
+  --color-green: #bbf7d0;   /* Vert menthe */
+  --color-yellow: #fde047;  /* Jaune soleil */
+  --color-purple: #c084fc;  /* Violet lila */
+  --color-orange: #fed7aa;  /* Orange pêche */
+  --color-card-bg: #ffffff; /* Fond blanc des cartes */
+
+  --border-thick: 3px solid var(--border-color);
+  --border-thin: 2px solid var(--border-color);
+  --shadow-hard: 4px 4px 0px 0px var(--shadow-color);
+  --shadow-hard-active: 1px 1px 0px 0px var(--shadow-color);
+  
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Réinitialisation de base */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-main);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typographie */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Classes utilitaires Neo-Brutalistes */
+.neo-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.neo-card {
+  background-color: var(--color-card-bg);
+  border: var(--border-thick);
+  border-radius: 16px;
+  box-shadow: var(--shadow-hard);
+  padding: 1.5rem;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.neo-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px 0px var(--shadow-color);
+}
+
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  background-color: var(--color-yellow);
+  color: var(--foreground);
+  border: var(--border-thick);
+  border-radius: 10px;
+  box-shadow: var(--shadow-hard);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--shadow-color);
+}
+
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-hard-active);
+}
+
+.neo-btn-pink {
+  background-color: var(--color-pink);
+}
+
+.neo-btn-blue {
+  background-color: var(--color-blue);
+}
+
+.neo-btn-green {
+  background-color: var(--color-green);
+}
+
+.neo-btn-secondary {
+  background-color: #ffffff;
+}
+
+.neo-input {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  border: var(--border-thick);
+  border-radius: 10px;
+  background-color: #ffffff;
+  outline: none;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.neo-input:focus {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px 0px var(--shadow-color);
+}
+
+/* Badges Neo-Brutalistes */
+.neo-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: var(--border-thin);
+  border-radius: 6px;
+  background-color: var(--color-orange);
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+}
+
+/* Style de Quadrant pour le Cartographe */
+.quadrant-solaire {
+  background-color: var(--color-pink);
+}
+.quadrant-tempete {
+  background-color: var(--color-orange);
+}
+.quadrant-brume {
+  background-color: var(--color-blue);
+}
+.quadrant-serein {
+  background-color: var(--color-green);
+}
+
+/* Animations et micro-interactions */
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pop {
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Navbar Neo-brutaliste */
+.neo-navbar {
+  background-color: #ffffff;
+  border-bottom: var(--border-thick);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.neo-brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+/* Responsivité Mobile */
+@media (max-width: 767px) {
+  h1 {
+    font-size: 2.2rem !important;
+  }
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  .neo-container {
+    padding: 1rem 0.75rem !important;
+  }
+  
+  .neo-card {
+    padding: 1rem !important;
+    border-width: 2px !important;
+    box-shadow: 2px 2px 0px 0px var(--shadow-color) !important;
+  }
+  
+  .neo-card:hover {
+    transform: translate(-1.5px, -1.5px) !important;
+    box-shadow: 3.5px 3.5px 0px 0px var(--shadow-color) !important;
+  }
+
+  .neo-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem !important;
+    border-width: 2px !important;
+    box-shadow: 2px 2px 0px 0px var(--shadow-color) !important;
+  }
+
+  .neo-btn:hover {
+    transform: translate(-1px, -1px) !important;
+    box-shadow: 3px 3px 0px 0px var(--shadow-color) !important;
+  }
+
+  .neo-btn:active {
+    transform: translate(1px, 1px) !important;
+    box-shadow: var(--shadow-hard-active) !important;
+  }
+
+  .neo-input {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.9rem !important;
+    border-width: 2px !important;
+  }
+
+  .neo-input:focus {
+    transform: translate(-1px, -1px) !important;
+    box-shadow: 2px 2px 0px 0px var(--shadow-color) !important;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
