@@ -16,7 +16,11 @@ const getPrismaInstance = () => {
     throw new Error("Database connection URL (DATABASE_URL, POSTGRES_PRISMA_URL, or POSTGRES_URL) is not defined.");
   }
 
-  const pool = new pg.Pool({ connectionString });
+  const isLocal = connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+  const pool = new pg.Pool({ 
+    connectionString,
+    ssl: isLocal ? false : { rejectUnauthorized: false }
+  });
   const adapter = new PrismaPg(pool);
 
   return new PrismaClient({
