@@ -198,8 +198,21 @@ a {
   letter-spacing: -0.5px;
 }
 
+.desktop-only {
+  display: inline-block;
+}
+.mobile-only {
+  display: none !important;
+}
+
 /* Responsivité Mobile */
 @media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: inline-block !important;
+  }
   h1 {
     font-size: 2.2rem !important;
   }
@@ -230,6 +243,8 @@ a {
     font-size: 0.9rem !important;
     border-width: 2px !important;
     box-shadow: 2px 2px 0px 0px var(--shadow-color) !important;
+    white-space: normal !important;
+    text-align: center;
   }
 
   .neo-btn:hover {
@@ -259,7 +274,7 @@ a {
   }
 
   .neo-brand {
-    font-size: 1.25rem !important;
+    font-size: 1.05rem !important;
   }
 
   .neo-nav {

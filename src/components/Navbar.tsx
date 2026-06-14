@@ -13,7 +13,8 @@ export default function Navbar() {
       </a>
       <nav className="neo-nav" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
         <a href="/" className="neo-btn neo-btn-secondary neo-btn-compact" style={{ padding: "0.4rem 0.8rem", fontSize: "0.9rem" }}>
-          {t("navbar.home")}
+          <span className="desktop-only">{t("navbar.home")}</span>
+          <span className="mobile-only">🏠</span>
         </a>
         
         {/* Selector for Language - Redesigned for maximum visibility */}

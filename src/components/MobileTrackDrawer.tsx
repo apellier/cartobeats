@@ -1,6 +1,4 @@
-"use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation, formatKeyMode } from "@/context/LanguageContext";
 
@@ -51,6 +49,56 @@ export default function MobileTrackDrawer({
   onClose
 }: MobileTrackDrawerProps) {
   const { t, language } = useTranslation();
+  
+  // Animation states
+  const [active, setActive] = useState(false);
+  const [startY, setStartY] = useState<number | null>(null);
+  const [translateY, setTranslateY] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+
+  useEffect(() => {
+    // Slide up on mount
+    const timer = setTimeout(() => setActive(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleClose = () => {
+    setActive(false);
+    setTimeout(() => {
+      onClose();
+    }, 250); // wait for slide down transition
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Only allow swipe down if content is not scrolled
+    if (e.currentTarget.scrollTop > 0) return;
+    setStartY(e.touches[0].clientY);
+    setIsSwiping(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isSwiping || startY === null) return;
+    const currentTouchY = e.touches[0].clientY;
+    const diffY = currentTouchY - startY;
+
+    // Only allow dragging down (positive translation)
+    if (diffY > 0) {
+      setTranslateY(diffY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isSwiping) return;
+    setIsSwiping(false);
+
+    // If dragged down far enough, close it. Otherwise animate back to 0.
+    if (translateY > 100) {
+      handleClose();
+    } else {
+      setTranslateY(0);
+    }
+    setStartY(null);
+  };
 
   if (typeof document === "undefined") return null;
 
@@ -76,16 +124,13 @@ export default function MobileTrackDrawer({
         display: "flex",
         flexDirection: "column",
         gap: "0.75rem",
-        animation: "slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards"
+        transform: `translateY(${active ? translateY : 100}%)`,
+        transition: isSwiping ? "none" : "transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1)"
       }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-      `}} />
-
       {/* Swipe handle indicator */}
       <div style={{
         width: "40px",
@@ -93,7 +138,8 @@ export default function MobileTrackDrawer({
         backgroundColor: "#ccc",
         borderRadius: "3px",
         alignSelf: "center",
-        marginBottom: "0.25rem"
+        marginBottom: "0.25rem",
+        cursor: "grab"
       }} />
 
       {/* Header: Title, Close button */}
@@ -102,7 +148,7 @@ export default function MobileTrackDrawer({
           Inspecteur de Titre 🔎
         </span>
         <button 
-          onClick={onClose}
+          onClick={handleClose}
           style={{
             border: "2px solid #1c1917",
             backgroundColor: "var(--color-pink)",
