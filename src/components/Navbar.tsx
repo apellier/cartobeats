@@ -11,49 +11,60 @@ export default function Navbar() {
       <a href="/" className="neo-brand">
         CARTOBEAT
       </a>
-      <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-        <a href="/" className="neo-btn neo-btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.9rem" }}>
+      <nav className="neo-nav" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <a href="/" className="neo-btn neo-btn-secondary neo-btn-compact" style={{ padding: "0.4rem 0.8rem", fontSize: "0.9rem" }}>
           {t("navbar.home")}
         </a>
         
-        {/* Selector for Language */}
+        {/* Selector for Language - Redesigned for maximum visibility */}
         <div style={{ 
           display: "flex", 
           border: "var(--border-thin)", 
-          borderRadius: "6px", 
+          borderRadius: "8px", 
           overflow: "hidden", 
-          boxShadow: "1.5px 1.5px 0px 0px #1c1917" 
+          boxShadow: "3px 3px 0px 0px var(--shadow-color)",
+          backgroundColor: "#ffffff"
         }}>
           <button
             onClick={() => setLanguage("fr")}
             style={{
-              padding: "0.25rem 0.5rem",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
+              padding: "0.4rem 0.8rem",
+              fontSize: "0.85rem",
+              fontWeight: 800,
               cursor: "pointer",
               border: "none",
-              backgroundColor: language === "fr" ? "var(--color-pink)" : "#ffffff",
+              backgroundColor: language === "fr" ? "var(--color-yellow)" : "#ffffff",
               color: "var(--foreground)",
-              outline: "none"
+              outline: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              transition: "background-color 0.2s ease"
             }}
+            title="Français"
           >
-            FR
+            FR 🇫🇷
           </button>
           <button
             onClick={() => setLanguage("en")}
             style={{
-              padding: "0.25rem 0.5rem",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
+              padding: "0.4rem 0.8rem",
+              fontSize: "0.85rem",
+              fontWeight: 800,
               cursor: "pointer",
               border: "none",
-              borderLeft: "1.5px solid #1c1917",
-              backgroundColor: language === "en" ? "var(--color-pink)" : "#ffffff",
+              borderLeft: "2px solid var(--border-color)",
+              backgroundColor: language === "en" ? "var(--color-yellow)" : "#ffffff",
               color: "var(--foreground)",
-              outline: "none"
+              outline: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              transition: "background-color 0.2s ease"
             }}
+            title="English"
           >
-            EN
+            EN 🇬🇧
           </button>
         </div>
       </nav>

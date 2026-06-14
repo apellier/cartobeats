@@ -252,6 +252,24 @@ a {
     transform: translate(-1px, -1px) !important;
     box-shadow: 2px 2px 0px 0px var(--shadow-color) !important;
   }
+
+  /* Ajustements responsifs pour la barre de navigation mobile */
+  .neo-navbar {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .neo-brand {
+    font-size: 1.25rem !important;
+  }
+
+  .neo-nav {
+    gap: 0.5rem !important;
+  }
+
+  .neo-btn-compact {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 @keyframes spin {

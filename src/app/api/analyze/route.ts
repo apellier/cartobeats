@@ -351,104 +351,157 @@ export async function GET(request: NextRequest) {
       resolvedTracks = playlistData.tracks;
     }
 
-    // 3. Enregistrer/Mettre à jour les données dans la base SQLite
-    await prisma.$transaction(async (tx) => {
-      // Enregistrer la playlist
-      await tx.playlist.upsert({
-        where: { id: playlistId },
-        update: {
-          name: playlistName,
-          description: playlistDescription,
-          ownerName: playlistOwnerName,
-          imageUrl: playlistImageUrl,
-          trackCount: playlistTrackCount,
-          updatedAt: new Date(),
-        },
-        create: {
-          id: playlistId,
-          name: playlistName,
-          description: playlistDescription,
-          ownerName: playlistOwnerName,
-          imageUrl: playlistImageUrl,
-          trackCount: playlistTrackCount,
-        },
-      });
-
-      // Enregistrer/Mettre à jour chaque morceau
-      for (const track of resolvedTracks) {
-        await tx.track.upsert({
-          where: { id: track.id },
+    // 3. Enregistrer/Mettre à jour les données dans la base
+    await prisma.$transaction(
+      async (tx) => {
+        // Enregistrer la playlist
+        await tx.playlist.upsert({
+          where: { id: playlistId },
           update: {
-            name: track.name,
-            artists: track.artists,
-            primaryArtist: track.primaryArtist,
-            primaryArtistId: track.primaryArtistId,
-            albumName: track.albumName,
-            albumImageUrl: track.albumImageUrl,
-            durationMs: track.durationMs,
-            previewUrl: track.previewUrl,
-            isrc: track.isrc,
-            danceability: track.danceability,
-            energy: track.energy,
-            key: track.key,
-            loudness: track.loudness,
-            mode: track.mode,
-            speechiness: track.speechiness,
-            acousticness: track.acousticness,
-            instrumentalness: track.instrumentalness,
-            liveness: track.liveness,
-            valence: track.valence,
-            tempo: track.tempo,
+            name: playlistName,
+            description: playlistDescription,
+            ownerName: playlistOwnerName,
+            imageUrl: playlistImageUrl,
+            trackCount: playlistTrackCount,
+            updatedAt: new Date(),
           },
           create: {
-            id: track.id,
-            name: track.name,
-            artists: track.artists,
-            primaryArtist: track.primaryArtist,
-            primaryArtistId: track.primaryArtistId,
-            albumName: track.albumName,
-            albumImageUrl: track.albumImageUrl,
-            durationMs: track.durationMs,
-            previewUrl: track.previewUrl,
-            isrc: track.isrc,
-            danceability: track.danceability,
-            energy: track.energy,
-            key: track.key,
-            loudness: track.loudness,
-            mode: track.mode,
-            speechiness: track.speechiness,
-            acousticness: track.acousticness,
-            instrumentalness: track.instrumentalness,
-            liveness: track.liveness,
-            valence: track.valence,
-            tempo: track.tempo,
+            id: playlistId,
+            name: playlistName,
+            description: playlistDescription,
+            ownerName: playlistOwnerName,
+            imageUrl: playlistImageUrl,
+            trackCount: playlistTrackCount,
           },
         });
-      }
 
-      // Supprimer les anciennes relations
-      await tx.playlistTrack.deleteMany({
-        where: { playlistId: playlistId },
-      });
+        // Récupérer les morceaux existants pour éviter les upserts individuels lents
+        const trackIds = resolvedTracks.map((t) => t.id);
+        const existingTracks = await tx.track.findMany({
+          where: { id: { in: trackIds } },
+          select: {
+            id: true,
+            danceability: true,
+            energy: true,
+          },
+        });
 
-      // Créer les nouvelles relations de liaison (en évitant les doublons de morceaux)
-      const insertedTrackIds = new Set<string>();
-      for (let index = 0; index < resolvedTracks.length; index++) {
-        const track = resolvedTracks[index];
-        if (insertedTrackIds.has(track.id)) {
-          continue; // Éviter la contrainte unique (playlistId, trackId) si le morceau est en double
+        const existingTracksMap = new Map(
+          existingTracks.map((t) => [t.id, t])
+        );
+
+        const tracksToCreate: any[] = [];
+        const tracksToUpdate: any[] = [];
+
+        for (const track of resolvedTracks) {
+          const existing = existingTracksMap.get(track.id);
+          if (!existing) {
+            tracksToCreate.push(track);
+          } else {
+            // Si le morceau existe mais n'avait pas de caractéristiques audio (valence/energy nulles)
+            // et qu'on les a maintenant résolues, on met à jour.
+            const needsUpdate =
+              (existing.danceability === null && track.danceability !== null) ||
+              (existing.energy === null && track.energy !== null);
+            if (needsUpdate) {
+              tracksToUpdate.push(track);
+            }
+          }
         }
-        insertedTrackIds.add(track.id);
 
-        await tx.playlistTrack.create({
-          data: {
+        // Créer les nouveaux morceaux en une seule requête (createMany)
+        if (tracksToCreate.length > 0) {
+          await tx.track.createMany({
+            data: tracksToCreate.map((track) => {
+              return {
+                id: track.id,
+                name: track.name,
+                artists: track.artists,
+                primaryArtist: track.primaryArtist,
+                primaryArtistId: track.primaryArtistId,
+                albumName: track.albumName,
+                albumImageUrl: track.albumImageUrl,
+                durationMs: track.durationMs,
+                previewUrl: track.previewUrl,
+                isrc: track.isrc,
+                danceability: track.danceability,
+                energy: track.energy,
+                key: track.key,
+                loudness: track.loudness,
+                mode: track.mode,
+                speechiness: track.speechiness,
+                acousticness: track.acousticness,
+                instrumentalness: track.instrumentalness,
+                liveness: track.liveness,
+                valence: track.valence,
+                tempo: track.tempo,
+              };
+            }),
+            skipDuplicates: true,
+          });
+        }
+
+        // Mettre à jour les morceaux existants qui ont besoin d'une mise à jour (très rare)
+        for (const track of tracksToUpdate) {
+          await tx.track.update({
+            where: { id: track.id },
+            data: {
+              name: track.name,
+              artists: track.artists,
+              primaryArtist: track.primaryArtist,
+              primaryArtistId: track.primaryArtistId,
+              albumName: track.albumName,
+              albumImageUrl: track.albumImageUrl,
+              durationMs: track.durationMs,
+              previewUrl: track.previewUrl,
+              isrc: track.isrc,
+              danceability: track.danceability,
+              energy: track.energy,
+              key: track.key,
+              loudness: track.loudness,
+              mode: track.mode,
+              speechiness: track.speechiness,
+              acousticness: track.acousticness,
+              instrumentalness: track.instrumentalness,
+              liveness: track.liveness,
+              valence: track.valence,
+              tempo: track.tempo,
+            },
+          });
+        }
+
+        // Supprimer les anciennes relations
+        await tx.playlistTrack.deleteMany({
+          where: { playlistId: playlistId },
+        });
+
+        // Créer les nouvelles relations de liaison en lot (createMany)
+        const insertedTrackIds = new Set<string>();
+        const playlistTrackData = [];
+        for (let index = 0; index < resolvedTracks.length; index++) {
+          const track = resolvedTracks[index];
+          if (insertedTrackIds.has(track.id)) {
+            continue; // Éviter la contrainte unique (playlistId, trackId) si le morceau est en double
+          }
+          insertedTrackIds.add(track.id);
+
+          playlistTrackData.push({
             playlistId: playlistId,
             trackId: track.id,
             position: index,
-          },
-        });
+          });
+        }
+
+        if (playlistTrackData.length > 0) {
+          await tx.playlistTrack.createMany({
+            data: playlistTrackData,
+          });
+        }
+      },
+      {
+        timeout: 60000, // 60 secondes pour les playlists longues sur Supabase/Vercel
       }
-    });
+    );
 
     return NextResponse.json({
       id: playlistId,

@@ -175,7 +175,7 @@ export default function ShareModal({
             width="340" 
             height="450" 
             viewBox="0 0 340 450" 
-            style={{ backgroundColor: "#fbf8f3" }}
+            style={{ backgroundColor: "#fbf8f3", maxWidth: "100%", height: "auto" }}
           >
             {/* Style interne pour garantir le rendu lors de l'export */}
             <style>{`
